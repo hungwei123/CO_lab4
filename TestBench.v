@@ -121,8 +121,8 @@ end
 
 initial  begin
 	//$readmemb("CO_P4_test_data1.txt", cpu.IM.Instr_Mem);	mode = 0;  // (A) basic
-	//$readmemb("CO_P4_test_data2.txt", cpu.IM.Instr_Mem);	mode = 1;  // (B) advance set1 (Fibonacci)
-	$readmemb("CO_P4_test_data2_2.txt", cpu.IM.Instr_Mem);	mode = 2;  // (C) advance set2
+	$readmemb("CO_P4_test_data2.txt", cpu.IM.Instr_Mem);	mode = 1;  // (B) advance set1 (Fibonacci)
+	//$readmemb("CO_P4_test_data2_2.txt", cpu.IM.Instr_Mem);	mode = 2;  // (C) advance set2
     	handle = $fopen("CO_P4_result.txt");
 	
 	CLK = 0;
@@ -139,12 +139,37 @@ initial  begin
 		pc = pc + 32'd4;
 		//$display("%d %d %d", cpu.DM.addr_i, cpu.DM.data_i, cpu.DM.MemWrite_i);
 		//$display("%b %b %b", cpu.ALU.aluSrc1, cpu.ALU.aluSrc2, cpu.ALU.ALU_operation_i);
+		
+		/*case(cpu.Decoder.instr_op_i)
+			6'b001000:begin
+				$display("addi");
+			end
+			6'b000000:begin
+				$display("add or jr");
+			end
+			6'b011000:begin
+				$display("jal");
+			end
+			6'b011100:begin
+				$display("sw");
+			end
+			6'b000100:begin
+				$display("beq");
+			end
+			6'b011101:begin
+				$display("j");
+			end
+			6'b011110:begin
+				$display("lw");
+			end
+		endcase*/
+		//$display("%b %b %b %d", cpu.RF.RSdata_o, cpu.RF.RTdata_o, cpu.mem_to_reg.data_o, cpu.RF.Reg_File[0]);
 		// check wether
 		
 		case(instruction[31:26])
 			OP_RTYPE:begin
 				rs = instruction[25:21];
-				rt = instruction[20:16];
+				rt = instruction[20:16];				
 				rd = instruction[15:11];
 				case(instruction[5:0])
 					FUNC_ADD:begin
@@ -461,7 +486,7 @@ initial  begin
 			end
 			
 			$display("============================================");
-			//$display("(A) basic score: %d / 65",score);
+			$display("(A) basic score: %d / 65",score);
 		end
 		1:begin
 			for(i=0; i<4; i=i+1)begin
@@ -477,7 +502,7 @@ initial  begin
 				score = score + 1;
 			end
 			$display("============================================");
-			//$display("(B) advance set1: %d / 10",score);
+			$display("(B) advance set1: %d / 10",score);
 		end
 		2:begin
 			for(i=0; i<5; i=i+1)begin
@@ -496,7 +521,7 @@ initial  begin
 			end
 
 			$display("============================================");
-			//$display("(C) advance set2: %d / 5",score);
+			$display("(C) advance set2: %d / 5",score);
 		end
 		3:begin
 			for(i=0; i<5; i=i+1)begin

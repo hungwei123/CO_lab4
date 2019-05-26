@@ -64,6 +64,9 @@ if(ALUOp_i == 3'b010) begin // R-type
 		LR = 0;
 		furslt = 2'b00;
 	end
+	if(funct_i == 6'b001000) begin //jr
+		furslt = 2'b10;
+	end
 end
 else if(ALUOp_i == 3'b100) begin	
 	alu_operation = 4'b1000; //ADDI
@@ -79,9 +82,6 @@ end
 else if(ALUOp_i == 3'b001) begin //beq, bne
 	alu_operation = 4'b1011;
 end
-//else if(ALUOp_i == 3'b110) begin //bne
-//	alu_operation =	4'b1011;
-//end
 else if (ALUOp_i == 3'b011) begin // blt
 	alu_operation = 4'b0101;
 end

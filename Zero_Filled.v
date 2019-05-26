@@ -20,7 +20,7 @@ wire	[32-1:0] data_o;
 
 
 /*your code here*/
-
+assign data_o = 0;
 
 
 

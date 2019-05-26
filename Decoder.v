@@ -5,24 +5,24 @@ input	[6-1:0] instr_op_i;
 output			RegWrite_o;
 output	[3-1:0] ALUOp_o;
 output			ALUSrc_o;
-output			RegDst_o;
+output	[2-1:0]	RegDst_o;
 output			Branch_o;
 output			Jump_o;
 output			MemRead_o;
 output			MemWrite_o;
-output			MemtoReg_o;
+output	[2-1:0]	MemtoReg_o;
 output			BranchType_o;
  
 //Internal Signals
 wire	[3-1:0] ALUOp_o;
 wire			ALUSrc_o;
 wire			RegWrite_o;
-wire			RegDst_o;
+wire	[2-1:0]	RegDst_o;
 wire			Branch_o;
 wire			Jump_o;
 wire			MemRead_o;
 wire			MemWrite_o;
-wire			MemtoReg_o;
+wire	[2-1:0] MemtoReg_o;
 wire			BranchType_o;
  
 //Main function
@@ -30,34 +30,34 @@ wire			BranchType_o;
 reg	[3-1:0] aluOp_o;
 reg	aluSrc_o;
 reg	regWrite_o;
-reg	regDst_o;
+reg	[2-1:0] regDst_o;
 reg			branch_o;
 reg			jump_o;
 reg			memRead_o;
 reg			memWrite_o;
-reg			memtoReg_o;
-reg 			branchType_o;
+reg	[2-1:0] memtoReg_o;
+reg 		branchType_o;
 
 always @(*) begin
 	case (instr_op_i)
-		6'b000000: begin // add,sub,and,or,nor,slt,sll,srl
+		6'b000000: begin // add,sub,and,or,nor,slt,sll,srl,jr
 			aluOp_o = 3'b010;
 			aluSrc_o = 0;
 			regWrite_o = 1;
-			regDst_o = 1;
+			regDst_o = 2'b01;
 			branch_o = 0;
 			jump_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branchType_o = 0;
 		end
 		6'b001000: begin // addi
 			aluOp_o = 3'b100;
 			aluSrc_o = 1;
 			regWrite_o = 1;
-			regDst_o = 0;
-			memtoReg_o = 0;
+			regDst_o = 2'b00;
+			memtoReg_o = 2'b00;
 			branch_o = 0;
 			jump_o = 0;
 			memWrite_o = 0;
@@ -68,10 +68,10 @@ always @(*) begin
 			aluOp_o = 3'b000;
 			aluSrc_o = 1;
 			regWrite_o = 1;
-			regDst_o = 0;
+			regDst_o = 2'b00;
 			memWrite_o = 0;
 			memRead_o = 1;
-			memtoReg_o = 1;
+			memtoReg_o = 2'b01;
 			branch_o = 0;
 			jump_o = 0;
 			branchType_o = 0;
@@ -85,8 +85,8 @@ always @(*) begin
 			branch_o = 0;
 			jump_o = 0;
 			branchType_o = 0;
-			regDst_o = 0;
-			memtoReg_o = 0;
+			regDst_o = 2'b00;
+			memtoReg_o = 2'b00;
 		end
 		6'b000100: begin // beq
 			aluOp_o = 3'b001;
@@ -94,11 +94,11 @@ always @(*) begin
 			regWrite_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branch_o = 1;
 			branchType_o = 0;
 			jump_o = 0;
-			regDst_o = 0;
+			regDst_o = 2'b00;
 		end
 		6'b011010: begin // bne
 			aluOp_o = 3'b001; // 110
@@ -106,11 +106,11 @@ always @(*) begin
 			regWrite_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branch_o = 1;
 			branchType_o = 1;
 			jump_o = 0;
-			regDst_o = 0;
+			regDst_o = 2'b00;
 		end
 		6'b011101: begin // jump
 			jump_o = 1;
@@ -118,10 +118,21 @@ always @(*) begin
 			regWrite_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branch_o = 0;
 			branchType_o = 0;
-			regDst_o = 0;
+			regDst_o = 2'b00;
+		end
+		6'b011000: begin // jal
+			jump_o = 1;
+			aluSrc_o = 0;
+			regWrite_o = 1;
+			memRead_o = 0;
+			memWrite_o = 0;
+			memtoReg_o = 2'b10;
+			branch_o = 0;
+			branchType_o = 0;
+			regDst_o = 2'b10;
 		end
 		6'b011001: begin // blt
 			aluOp_o = 3'b011;
@@ -129,11 +140,11 @@ always @(*) begin
 			regWrite_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branch_o = 1;
 			branchType_o = 1;
 			jump_o = 0;
-			regDst_o = 0;
+			regDst_o = 2'b00;
 		end
 		6'b010010: begin // bnez
 			aluOp_o = 3'b111;
@@ -141,11 +152,11 @@ always @(*) begin
 			regWrite_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branch_o = 1;
 			branchType_o = 1;
 			jump_o = 0;
-			regDst_o = 0;
+			regDst_o = 2'b00;
 		end
 		6'b001110: begin // bgez
 			aluOp_o = 3'b110;
@@ -153,11 +164,11 @@ always @(*) begin
 			regWrite_o = 0;
 			memRead_o = 0;
 			memWrite_o = 0;
-			memtoReg_o = 0;
+			memtoReg_o = 2'b00;
 			branch_o = 1;
 			branchType_o = 1;
 			jump_o = 0;
-			regDst_o = 0;
+			regDst_o = 2'b00;
 		end
 	endcase
 end

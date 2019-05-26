@@ -8,14 +8,14 @@ input         	rst_n;
 wire [32-1:0] instruction, pc_i, pc_o, rsData, rtData, rdData;
 wire [32-1:0] extended, zeroFilled, rtData_before, aluResult, shifterResult;
 wire [32-1:0] data_read, result_mux3to1, shiftExtended, pcAdd4, jumpAddr, branchAddr, ifBranch;
-wire [32-1:0] shiftJump;
+wire [32-1:0] shiftJump, result_toPC;
 wire [5-1:0] writeAddr;
 wire [4-1:0] aluOperation;
 wire [3-1:0] aluOP;
-wire [2-1:0] furSlt;
-wire regDst, regWrite, aluSrc, aluZero, aluZero_not, aluOverflow, shiftLR;
-wire branch, jump, memRead, memWrite, memToRe, branchType;
-wire ifZero, pcSrc;
+wire [2-1:0] furSlt, regDst, memToReg;
+wire regWrite, aluSrc, aluZero, aluZero_not, aluOverflow, shiftLR;
+wire branch, jump, memRead, memWrite, branchType;
+wire ifZero, pcSrc, jrCtrl;
 //modules
 
 Program_Counter PC(      
@@ -42,9 +42,10 @@ Instr_Memory IM(
 
 
 
-Mux2to1 #(.size(5)) Mux_Write_Reg(
+Mux3to1 #(.size(5)) Mux_Write_Reg(
 .data0_i(instruction[20:16]),
 .data1_i(instruction[15:11]),
+.data2_i(5'b11111), //reg31
 .select_i(regDst),
 .data_o(writeAddr)
 );	
@@ -139,9 +140,10 @@ Data_Memory DM(
 .data_o(data_read)
 );
 
-Mux2to1 #(.size(32)) mem_to_reg(
+Mux3to1 #(.size(32)) mem_to_reg(
 .data0_i(result_mux3to1),
 .data1_i(data_read),
+.data2_i(pcAdd4),
 .select_i(memToReg),
 .data_o(rdData)
 );
@@ -184,6 +186,19 @@ Mux2to1 #(.size(32)) to_PC(
 .data0_i(ifBranch),
 .data1_i(jumpAddr),
 .select_i(jump),
+.data_o(result_toPC)
+);
+
+JR_Ctrl JRC(
+.funct_i(instruction[5:0]),
+.ALUOp_i(aluOP),
+.JR_control_o(jrCtrl)
+);
+
+Mux2to1 #(.size(32)) if_JR(
+.data0_i(result_toPC),
+.data1_i(rsData),
+.select_i(jrCtrl),
 .data_o(pc_i)
 );
 
